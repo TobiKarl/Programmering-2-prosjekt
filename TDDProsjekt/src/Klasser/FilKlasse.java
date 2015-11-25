@@ -1,120 +1,139 @@
 package Klasser;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class FilKlasse {
-	private HashMap<String, FileData> _dataMap;
-	private List<FileData> _duplicates ;
 	private Reader _reader;
-	
-	public FilKlasse(Reader reader){
+	private Map<Integer, FileData> _dataMap;
+	private List<String> _duplicates, _errors;
+
+	public FilKlasse(Reader reader) {
 		_reader = reader;
-		_duplicates = new ArrayList<FileData>();
-		_dataMap = new HashMap<String, FileData>();
+		_duplicates = new ArrayList<String>();
+		_errors = new ArrayList<String>();
+		_dataMap = new HashMap<Integer, FileData>();
 	}
-		
-	
-	public void readFile (String path) throws Exception{
-		File file = new File(path);
-		_reader = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-		
-		String textString,maaleID ,operation, binary1, binary2;
+
+	public void readFile() throws Exception {
+
+		String textString, maaleID, operation, binary1, binary2, binaryResult = null;
 		FileData data;
-		
-		while( (textString = _reader.readLine()) != null){
-			// 
+
+		while ((textString = _reader.readLine()) != null) {
+			//
+
 			String[] tokens = (textString.split("\\s+"));
-			maaleID = Integer.toString(Converter.hexToInt(tokens[0]) );
+
+			if (tokens.length != 4)
+				throw new IllegalArgumentException();
+			maaleID = tokens[0];
 			operation = tokens[1];
 			binary1 = tokens[2];
 			binary2 = tokens[3];
-			
-			String binaryResult = binaryOperation(operation, binary1, binary2);
-			
-			
-			if(!_dataMap.containsKey(maaleID)){
-				data = new FileData(operation, binaryResult);
-				_dataMap.put(maaleID, data);
+	
+			try {
+				binaryResult = binaryOperation(operation, binary1,
+						binary2);
+			} catch (Exception e) {
+				_errors.add(textString);
+				return;
 			}
+
+			if (_dataMap.containsKey(Converter.hexToInt(maaleID) ) ) 
+				_duplicates.add(textString);
 			else {
-				data = new FileData(operation, binaryResult, maaleID);
-				_duplicates.add(data);
+				data = new FileData(operation, binaryResult, binary1, binary2, Converter.binaryToInt(binaryResult));
+				_dataMap.put(Converter.hexToInt(maaleID), data);
 			}
+		
 		}
-		
+
 	}
-	
-	
-	public String binaryOperation(String operation, String b1, String b2){
+
+	public String binaryOperation(String operation, String b1, String b2)
+			throws Exception {
 		String result = "";
-		
-			if(operation.equals("1"))
-				result = Converter.bitwiseAND(b1, b2);
-			
-			else if(operation.equals("2"))
-				result = Converter.bitwiseOR(b1, b2);
-			
+
+		if (operation.equals("1"))
+			result = Converter.bitwiseAND(b1, b2);
+
+		else if (operation.equals("2"))
+			result = Converter.bitwiseOR(b1, b2);
+		else
+			throw new Exception();
+
 		return result;
 	}
-	
-	public BufferedReader getReader(){
+
+	public Reader getReader() {
 		return _reader;
 	}
-	
-	
-	public HashMap<String, FileData> getDataMap(){
-		try{
+
+	public Map<Integer, FileData> getDataMap() {
 		return _dataMap;
-		}
-		catch(NullPointerException e){
-			e.printStackTrace();
-		}
-		return _dataMap;
+
 	}
-	
-	public List<FileData> getDuplicates(){
+
+	public List<String> getDuplicates() {
 		return _duplicates;
 	}
 	
-	
-	 public class FileData {
-		 
-		 private String _ID;
-		 private String _operation;
-		 private String _results;
-		 
-		 FileData(String operation, String results){
-			 _operation = operation;
-			 _results = results;
-		 }
-		 
-		 FileData(String operation, String results, String ID){
-			 _operation = operation;
-			 _results = results;
-			 _ID = ID;
-		 }
-		 
-		 public String getID(){
-			 return _ID;
-		 }
-		 
-		 public String getOperation(){
-			 return _operation;
-		 }
-		 
-		 public String getResults(){
-			 return _results;
-		 }
-		 
+	public List<String> getErrors(){
+		return _errors;
 	}
-	 public static void main(String[] args) {
-		FilKlasse f1 = new FilKlasse();
+
+	public class FileData {
+
+		private String _operation,_results,_binary1,_binary2;
+		private Integer _integerResult;
+
+		public FileData(String operation, String results, String binary1,
+				String binary2, Integer integerResult) {
+			_operation = operation;
+			_results = results;
+			_binary1 = binary1;
+			_binary2 = binary2;
+			_integerResult = integerResult;
+		}
+
+
+		public String getOperation() {
+			return _operation;
+		}
+
+
+
+		public String getResults() {
+			return _results;
+		}
+
+
+
+		public String getBinary1() {
+			return _binary1;
+		}
+
+
+
+		public String getBinary2() {
+			return _binary2;
+		}
+
+
+
+		public Integer getIntegerResult() {
+			return _integerResult;
+		}
+
+
+
+		public String toString() {
+			return _operation + " " + _binary1 + " " + _binary2;
+		}
+
 	}
-	
+
 }
