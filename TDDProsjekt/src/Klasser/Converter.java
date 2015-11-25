@@ -2,8 +2,13 @@ package Klasser;
 
 
 public final class Converter {
-	private final static String hexRegexString="";
-	private final static String regexBinary = "";
+	//tillater kun hex verdier
+	//tillater kun string fra 0 t.o.m 6 i lengde
+	private final static String regexHexString="^[0-9A-Fa-f]{0,6}$";
+	
+	//tillater kun binære verdier
+	//tillater kun string fra 0 t.o.m 24 i lengde
+	private final static String regexBinary = "^[0-1]{0,24}$";
 	private final static String hexString="0123456789ABCDEF";
 	
 	private Converter() {
@@ -11,12 +16,9 @@ public final class Converter {
 
 	/** Return an int representation of a binary*/
 	public static Integer binaryToInt(String binary) {
-		// if(checkString(binary) );
-
-		if (binary.length() > 24) {
-			System.out.println("Binary String over 24 bits");
-			return  null;
-		}
+		if(checkBinaryString(binary) )	throw new IllegalArgumentException();
+		if(binary.length()==0) return 0;
+		
 		int decimal = 0;
 
 		if (binary.charAt(binary.length() - 1) == '1')
@@ -31,12 +33,8 @@ public final class Converter {
 
 	/**Return a binary representation of an int*/
 	public static String intToBinary(int decimal) {
-		if (decimal >= (int) Math.pow(2, 24)){
-			System.out.println("Int size larger than 24 bit");
-			return null;
-		}
-		
-		if(decimal == 0) return "0";
+		if (decimal >= (int) Math.pow(2, 24)) return null;
+		if(decimal <= 0) return "0";
 
 		int binaryDigits = 0;
 
@@ -57,29 +55,30 @@ public final class Converter {
 					binary += "0";
 			}
 		}
+		
+		while(binary.length() < 24) 
+			binary = "0" + binary;
+		
 		return binary;
 	}
 	
 	/**Return an int representation of a hex value*/
 	public static int hexToInt(String input){
-		if(input.length() > 6) throw new IllegalArgumentException();
+		if(checkHexString(input)) throw new IllegalArgumentException();
+		if(input.length()==0) return 0;
+		
 		String hex = input.toUpperCase();
-		checkHexString(hex);
-		hex.toUpperCase();
-		System.out.println(hex);
 		char[] chars = hex.toCharArray();
 		
 		int value=0;
 		
-		for(int i = 0; i < chars.length; i++){
-			
-			for(int k = 0 ; k<16 ;k++){
-				
-				if ( chars[i] == hexString.charAt(k) ){
-					value += k*Math.pow(16, chars.length-i-1);
-					break;
-				}
-			}
+		value += hexString.indexOf( chars[chars.length-1] );
+		
+		int position = 1;
+		
+		for(int i = 1; i < chars.length; i++){
+		value += hexString.indexOf( chars[chars.length-1-i] ) * Math.pow(16, position );
+		position++;
 		}
 		
 		return value;
@@ -87,60 +86,79 @@ public final class Converter {
 	
 	/**Return a hex representation of an int*/
 	public static String intToHex(int decimal){
+		if(decimal < 0) throw new IllegalArgumentException();
 		
-		String hex="";
+		String hex = "";
 		char[] hexValues = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 
 							'A', 'B', 'C', 'D', 'E', 'F'
 						   };
 		
 		String decToBinary = Converter.intToBinary(decimal);
 		
-		while(true){
-		if(decToBinary.length()%4 != 0)
-			decToBinary ="0" + decToBinary;
-		else break;
-		}
-		
+		String binary;
 		while(decToBinary.length() > 0){
-				String binary = "";
+				binary = "";
 				binary = decToBinary.substring(0, 4);
 				decToBinary=decToBinary.substring(4, decToBinary.length());
 				hex += hexValues[Converter.binaryToInt(binary)];
 		}
 		
+		while(hex.charAt(0)=='0')
+			hex=hex.substring(1);
 		
-		return hex;
+		return hex.toString();
 	}
 	
 	
 	
 	/**Check that the string only contains binary code*/
-	private static boolean checkStringForBinary(String string) {
+	protected static boolean checkBinaryString(String string) {
 		if (string.matches(regexBinary))
-			return true;
+			return false;
 
-		return false;
+		return true;
 	}
 	
 	/**Check if the string only contain hex code*/
-	private static boolean checkHexString(String hex){
-		if(hexRegexString.matches(hexRegexString)) return true;
+	protected static boolean checkHexString(String hex){
+		if(hex.matches(regexHexString)) 
+			return false;
 		
-		return false;
+		return true;
+	}
+	
+	public static String bitwiseAND (String s1, String s2){
+		String results="";
+		Converter.checkBinaryString(s1);
+		Converter.checkBinaryString(s2);
+		
+		for(int i = 0; i < s1.length(); i++){
+			if ( s1.charAt(i) == '1' && s1.charAt(i) == s2.charAt(i) )
+				results += "1";
+			else
+				results += "0";
+ 		}
+		
+		return results;
+	}
+	
+	public static String bitwiseOR (String s1, String s2){
+		String results="";
+		
+		for(int i = 0; i < s1.length(); i++){
+			if( s1.charAt(i) == '1' || s2.charAt(i) == '1')
+				results += "1";
+			else 
+				results += "0";
+		}
+		
+		return results;
 	}
 	
 	
 	public static void main(String[] args) {
+		System.out.println(intToHex(1));
 		
-		System.out.println("BINARY \n__________________");
-		for(int i = 0; i<=50; i++)
-			System.out.println(binaryToInt(intToBinary(i))+ " = " +intToBinary(i)  );
-		
-		System.out.println("\nHEX \n____________________");
-		for(int i = 0; i<=50; i++)
-			System.out.println(hexToInt(intToHex(i)) + " = " + intToHex(i));
-		
-		System.out.println(hexToInt("ABEFfe"));
 	}
 
 }
