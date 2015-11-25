@@ -43,7 +43,6 @@ public class FilKlasseTest {
 	public void readFile_illegalInput_ShouldThrowIllegalArgumentException() throws Exception{
 		when(mockReader.readLine()).thenReturn(ID + " 2 " + b1 + null );
 		f1.readFile();
-		
 	}
 	
 	@Test
@@ -87,8 +86,13 @@ public class FilKlasseTest {
 	}
 	
 	@Test
-	public void 
+	public void toString_ShouldReturnDescriptionWithToStringMethod() throws Exception{
+		when(mockReader.readLine()).thenReturn(ID + " 2 " + b1 + " " + b2, null);
+		f1.readFile();
+		assertThat(f1.getDataMap().get(IDtoHex).toString(), is (2 + " " + b1 + " " +b2));
+	}
 	
+
 
 
 }

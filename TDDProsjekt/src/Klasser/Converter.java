@@ -74,11 +74,8 @@ public final class Converter {
 		
 		value += hexString.indexOf( chars[chars.length-1] );
 		
-		int position = 1;
-		
 		for(int i = 1; i < chars.length; i++){
-		value += hexString.indexOf( chars[chars.length-1-i] ) * Math.pow(16, position );
-		position++;
+		value += hexString.indexOf( chars[chars.length-1-i] ) * Math.pow(16, i );
 		}
 		
 		return value;
@@ -156,9 +153,5 @@ public final class Converter {
 	}
 	
 	
-	public static void main(String[] args) {
-		System.out.println(intToHex(1));
-		
-	}
 
 }

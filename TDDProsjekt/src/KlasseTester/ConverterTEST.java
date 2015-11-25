@@ -51,7 +51,7 @@ public class ConverterTEST {
 		Converter.hexToInt("ABC1234");
 	}
 	
-	public void hexToInt_emptyInput_ShouldThrowIllegalArgException(){
+	public void hexToInt_emptyInput_ShouldReturn0(){
 		assertThat(Converter.hexToInt(""), is(0) );
 	}
 	
@@ -112,6 +112,6 @@ public class ConverterTEST {
 	public void intToBinary_negativeInt_ShouldReturn0 (){
 		assertThat ( Converter.intToBinary(-5), is("0"));
 	}
-	
+
 
 }
