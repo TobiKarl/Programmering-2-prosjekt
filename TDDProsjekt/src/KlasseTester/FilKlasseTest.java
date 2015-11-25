@@ -1,5 +1,6 @@
 package KlasseTester;
-
+ 
+import static org.mockito.Mockito.*;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
@@ -14,6 +15,7 @@ public class FilKlasseTest {
 	
 	@Before
 	public void setUp() throws Exception{
+		
 		f1 = new FilKlasse();
 		f1.readFile("sekvenser.txt");
 	}

@@ -9,12 +9,12 @@ import java.util.HashMap;
 import java.util.List;
 
 public class FilKlasse {
-	private BufferedReader _reader;
 	private HashMap<String, FileData> _dataMap;
 	private List<FileData> _duplicates ;
+	private Reader _reader;
 	
-	
-	public FilKlasse(){
+	public FilKlasse(Reader reader){
+		_reader = reader;
 		_duplicates = new ArrayList<FileData>();
 		_dataMap = new HashMap<String, FileData>();
 	}
@@ -44,7 +44,7 @@ public class FilKlasse {
 			}
 			else {
 				data = new FileData(operation, binaryResult, maaleID);
-				_dataMap.put(maaleID, data);
+				_duplicates.add(data);
 			}
 		}
 		
@@ -115,16 +115,6 @@ public class FilKlasse {
 	}
 	 public static void main(String[] args) {
 		FilKlasse f1 = new FilKlasse();
-		
-		try {
-			f1.readFile("sekvenser.txt");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		System.out.println(Converter.hexToInt("03ac0f") );
-		System.out.println(f1.getDataMap().get("240655").getResults());
-		f1.getDataMap().get("0394");
 	}
 	
 }
